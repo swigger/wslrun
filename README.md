@@ -14,15 +14,16 @@ OPTIONS:
 ```
 
 ### examples
+```shell
+# vim
+wslrun vim test.c
 
-    # vim
-    wslrun vim test.c
-    
-    # run default shell (bash)
-    wslrun
-    
-    # run with root
-    wslrun --sudo
-    
-    # run sshd on login. put this code to xxx.bat in "start menu" -> "Start up" folder
-    wslrun --sudo --daemon bash -c "service ssh start ; cat"
+# run default shell (bash)
+wslrun
+
+# run with root
+wslrun --sudo
+
+# run sshd on login. put this code to xxx.bat in "start menu" -> "Start up" folder
+wslrun --sudo --daemon bash -c "service ssh start ; cat"
+```
