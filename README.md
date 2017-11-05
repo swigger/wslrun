@@ -3,13 +3,13 @@
 * built with vs2017.
 * tested on windows 10 1709.16299
 
->usage:
->wslrun [OPTIONS] [cmd [args...]]
->
->OPTIONS:
-  ~: run in home dir (home)
-  --nopath: no nt path
-  --sudo: run with root
+    usage:
+    wslrun [OPTIONS] [cmd [args...]]
+    
+    OPTIONS:
+      ~: run in home dir (home)
+      --nopath: no nt path
+      --sudo: run with root
 
 
 ### examples
