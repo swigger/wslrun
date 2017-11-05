@@ -1,0 +1,95 @@
+
+
+typedef int _LxssDistributionState;
+
+struct ILxssUserSession
+{
+	struct ILxssUserSession_vtbl * vtbl;
+};
+
+struct ILxssUserSession_vtbl
+{
+	long (__stdcall *QueryInterface)(ILxssUserSession*, IID*, void**);
+	long (__stdcall *AddRef)(ILxssUserSession*);
+	long (__stdcall *Release)(ILxssUserSession*);
+	
+
+	long (__stdcall *CreateInstance)(ILxssUserSession*, _GUID const *,_GUID const &,void * *);
+	long (__stdcall *RegisterDistribution)(ILxssUserSession*, USHORT const *,DWORD,USHORT const *,USHORT const *,_GUID *);
+	long (__stdcall *GetDistributionId)(ILxssUserSession*, USHORT const *,DWORD,_GUID *);
+	long (__stdcall *InitializeFileSystem)(ILxssUserSession*, USHORT const *);
+	long (__stdcall *SetDistributionState)(ILxssUserSession*, _GUID const *,_LxssDistributionState,_LxssDistributionState *);
+	long (__stdcall *QueryDistributionState)(ILxssUserSession*, _GUID const *,_LxssDistributionState *);
+	long (__stdcall *UnregisterDistribution)(ILxssUserSession*, GUID const *);
+	long (__stdcall *ConfigureDistribution)(ILxssUserSession*, _GUID const *,char const *,DWORD,DWORD,char const * *,DWORD);
+	long (__stdcall *GetDistributionConfiguration)(ILxssUserSession*, _GUID const *,USHORT * *,DWORD *,USHORT * *,char * *,DWORD *,DWORD *,char * * *,DWORD *);
+	long (__stdcall *GetDefaultDistribution)(ILxssUserSession*, _GUID *);
+	long (__stdcall *SetDefaultDistribution)(ILxssUserSession*, _GUID const *);
+	long (__stdcall *EnumerateDistributions)(ILxssUserSession*, DWORD,DWORD *,_GUID * *);
+};
+
+struct _LXSS_STD_HANDLES
+{
+	HANDLE STDIN;
+	HANDLE STDOUT;
+	HANDLE STDERR;
+};
+
+struct hd_info_ex
+{
+	void * hd_input;
+	void * hd_output;
+	void * hd_error;
+	
+	void * ano_conout;
+	
+	BYTE stdin_ok;
+	BYTE stdout_ok;
+	BYTE stderr_ok;
+	BYTE reserved;
+	
+	DWORD input_mode;
+	DWORD anno_mode;
+	DWORD old_con_cp;
+	DWORD old_con_out_cp;
+	DWORD reserved1;
+};
+
+struct _LXSS_CONSOLE_DATA
+{
+	DWORD ConsoleHandle;
+};
+
+struct lx::helpers::SvcCommIo
+{
+	_LXSS_STD_HANDLES handles;
+	hd_info_ex iex;
+	_LXSS_CONSOLE_DATA cd;
+};
+
+struct ILxssInstance
+{
+	struct ILxssInstance_vtbl * vtbl;
+};
+
+struct ILxssInstance_vtbl
+{
+	long (__stdcall *QueryInterface)(ILxssInstance*, IID*, void**);
+	long (__stdcall *AddRef)(ILxssInstance*);
+	long (__stdcall *Release)(ILxssInstance*);
+	
+	long (__stdcall *RegisterAdssBusServer)(ILxssInstance*, char const *,DWORD *);
+	long (__stdcall *GetId)(ILxssInstance*, _GUID *);
+	long (__stdcall *CreateLxProcess)(ILxssInstance*, char const * exec_path, unsigned long argc, char const * * argv,
+		unsigned long env_cnt,char const * * env, LPCOLESTR path_maybe, LPCOLESTR unk2, DWORD keep_running,
+		_LXSS_STD_HANDLES * hds, _LXSS_CONSOLE_DATA * data,
+		DWORD user_id, DWORD * out1,DWORD * out2);
+	long (__stdcall *ConnectAdssBusServer)(ILxssInstance*, char const *,DWORD *);
+};
+
+struct lx::helpers::SvcComm
+{
+	ILxssUserSession * session;
+	ILxssInstance * instance;
+};
+
