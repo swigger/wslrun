@@ -56,7 +56,7 @@ ILxssInstance : public IUnknown
 	virtual HRESULT STDMETHODCALLTYPE RegisterAdssBusServer(char const *,DWORD *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetId(_GUID *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE CreateLxProcess(char const * exec_path, unsigned long argc, char const * * argv,
-		unsigned long env_cnt,char const * * env, LPCOLESTR cwd, LPCOLESTR search_paths, DWORD enable_ntpid,
+		unsigned long env_cnt,char const * * env, LPCOLESTR cwd, LPCOLESTR search_paths, DWORD sync_io,
 		_LXSS_STD_HANDLES * hds, _LXSS_CONSOLE_DATA * data,
 		DWORD user_id, DWORD * pObjProcess,DWORD * pObjMessage) = 0;
 	virtual HRESULT STDMETHODCALLTYPE ConnectAdssBusServer(char const *,DWORD *) = 0;
