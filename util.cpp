@@ -97,7 +97,7 @@ CAnsiConsole::CAnsiConsole()
 	SetConsoleCP(CP_UTF8);
 	SetConsoleOutputCP(CP_UTF8);
 
-	const wchar_t * buf = L"1033\0\0";
+	const wchar_t * buf = L"0409\0\0";
 	ULONG no = 0;
 	SetThreadPreferredUILanguages(MUI_LANGUAGE_ID, buf, &no);
 }
