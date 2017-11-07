@@ -319,6 +319,16 @@ int main(int argc, const char ** argv)
 		{
 			return usage(), 1;
 		}
+		else if (strcmp(argv[i], "--") == 0)
+		{
+			++i;
+			break;
+		}
+		else if (argv[i][0] == '-')
+		{
+			fprintf(stderr, "Unknown option: %s\n", argv[i]);
+			return 1;
+		}
 		else
 			break;
 	}

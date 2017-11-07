@@ -25,5 +25,5 @@ wslrun
 wslrun --sudo
 
 # run sshd on login. put this code to xxx.bat in "start menu" -> "Start up" folder
-wslrun --sudo --daemon bash -c "service ssh start ; cat"
+wslrun --keep --daemon --sudo bash -c "service ssh start"
 ```
