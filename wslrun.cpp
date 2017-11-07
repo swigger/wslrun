@@ -183,6 +183,7 @@ static void set_hd(_LXSS_STD_HANDLE & hd, int index)
 
 struct wslrun_args
 {
+	uint32_t keep_run;
 	DWORD user_id;
 	TCHAR cwd[MAX_PATH];
 	WCHAR path[4096];
@@ -269,6 +270,12 @@ int do_run(wslrun_args * args)
 	DWORD dw = -1;
 	AdssBusClientpIoctl((HANDLE)(uintptr_t)oblow, IOCTL_ADSS_LX_PROCESS_HANDLE_WAIT_FOR_SIGNAL, &dw, sizeof(dw), &dw, sizeof(dw));
 
+	if (args->keep_run)
+	{
+		for (;;)
+			Sleep(86400000);
+	}
+
     return dw >> 8;
 }
 
@@ -278,6 +285,7 @@ int main(int argc, const char ** argv)
 	CHILDRUN_HOOK_MAIN();
 
 	wslrun_args args;
+	memset(&args, 0, sizeof(args));
 	args.user_id = -1;
 	GetCurrentDirectory(_countof(args.cwd), args.cwd) || (args.cwd[0] = 0);
 	ExpandEnvironmentStrings(L"%PATH%", args.path, _countof(args.path)) || (args.path[0] = 0);
@@ -291,9 +299,13 @@ int main(int argc, const char ** argv)
 		{
 			args.cwd[0] = 0;
 		}
-		else if (strcmp(argv[i], "--sudo") == 0)
+		else if (strcmp(argv[i], "--sudo") == 0 || strcmp(argv[i], "--root") == 0)
 		{
 			args.user_id = 0;
+		}
+		else if (strcmp(argv[i], "--keep") == 0)
+		{
+			args.keep_run = 1;
 		}
 		else if (strcmp(argv[i], "--nopath") == 0)
 		{
