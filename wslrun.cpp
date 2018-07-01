@@ -67,6 +67,7 @@ void adss_process_msg(HANDLE hdmsg, string & rdo)
 		//sinfo.lpDesktop = L"winsta0\\default";
 		LPCWSTR dir = wdir.c_str();
 		if (!*dir) dir = 0;
+		PROC_THREAD_ATTRIBUTE_GROUP_AFFINITY;
 		BOOL b = CreateProcess(wexe.c_str(), &wcmd[0], NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT, 0, dir, &sinfo, &pinfo);
 		if (b)
 		{
@@ -99,7 +100,7 @@ void adss_process_msg(HANDLE hdmsg, string & rdo)
 	{
 		string rdo1;
 		read_file_all(hdmsg, rdo1);
-		//assert(rdo1.length() == 16);
+		//assert(rdo1.length() == 32);
 	}
 
 	for (int i = 0; i < 3; ++i)
@@ -187,6 +188,8 @@ struct wslrun_args
 	DWORD user_id;
 	TCHAR cwd[MAX_PATH];
 	WCHAR path[4096];
+	WCHAR envs[4096];
+	DWORD envs_sz;
 	int argc;
 	char argvs[8192];
 };
@@ -212,7 +215,7 @@ int do_run(wslrun_args * args)
 	}
 
 	CComPtr<ILxssInstance> inst;
-	session->CreateInstance(0/*installed linux selection*/, __uuidof(ILxssInstance), (void**)&inst);
+	session->CreateInstance(0/*installed linux selection*/, 1/*idx*/, __uuidof(ILxssInstance), (void**)&inst);
 	if (!inst)
 	{
 		fprintf(stderr, "failed to create lxss instance. Install at least one dist of linux plz.\n");
@@ -236,13 +239,11 @@ int do_run(wslrun_args * args)
 		p += strlen(p) + 1;
 	}
 
-	DWORD sync_io = 0;
-	if (hds.STDIN.Handle || hds.STDOUT.Handle || hds.STDERR.Handle)
-		sync_io = 1;
+	DWORD sync_io = 1;
 	DWORD oblow=0, obmsg=0;
 	HRESULT hr = inst->CreateLxProcess(args->argvs, args->argc, argvo, 0, NULL,
-		ptr_v(args->cwd), ptr_v(args->path), 
-		sync_io, &hds, &cd, args->user_id, &oblow, &obmsg);
+		ptr_v(args->cwd), ptr_v(args->path), ptr_v(args->envs), args->envs_sz, sync_io,
+		&hds, &cd, args->user_id, &oblow, &obmsg);
 
 	if (FAILED(hr))
 	{
@@ -289,6 +290,23 @@ int main(int argc, const char ** argv)
 	args.user_id = -1;
 	GetCurrentDirectory(_countof(args.cwd), args.cwd) || (args.cwd[0] = 0);
 	ExpandEnvironmentStrings(L"%PATH%", args.path, _countof(args.path)) || (args.path[0] = 0);
+	
+	LPCWSTR ss = GetEnvironmentStrings();
+	wstring envs;
+	while (*ss)
+	{
+		envs += ss;
+		envs += L'\0';
+		ss += wcslen(ss) + 1;
+	}
+	envs += L'\0';
+	if (envs.size() > _countof(args.envs))
+	{
+		fprintf(stderr, "internal error: buffer too small\n");
+		return -1;
+	}
+	memcpy(args.envs, envs.data(), envs.length() * 2);
+	args.envs_sz = envs.length();
 
 	int ecase = 0;
 	int i = 1;

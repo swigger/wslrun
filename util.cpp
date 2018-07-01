@@ -29,19 +29,39 @@ bool read_file_all(HANDLE hf, string & rdo)
 	char buf[4096];
 	HRESULT hr = 0;
 
-	do
+	for (;;)
 	{
-		ULONG olen = 0;
-		IO_STATUS_BLOCK iob = { 0 };
-		hr = AdssBusClientReceiveMessageAsync(hf, buf, sizeof(buf), &olen, &iob, hEvent);
-		if (hr == STATUS_PENDING)
+		do
 		{
-			WaitForSingleObject(hEvent, INFINITE);
-			hr = iob.Status;
-			olen = (ULONG)iob.Information;
+			ULONG olen = 0;
+			IO_STATUS_BLOCK iob = { 0 };
+			hr = AdssBusClientReceiveMessageAsync(hf, buf, sizeof(buf), &olen, &iob, hEvent);
+			if (hr == STATUS_PENDING)
+			{
+				WaitForSingleObject(hEvent, INFINITE);
+				hr = iob.Status;
+				olen = (ULONG)iob.Information;
+			}
+			rdo.append(buf, olen);
+		} while (hr == STATUS_BUFFER_TOO_SMALL);
+
+		if (rdo.length() == 8)
+		{
+			HANDLE hdxx = *(void**)rdo.c_str();
+			LARGE_INTEGER bo = { 0 };
+			IO_STATUS_BLOCK iob = { 0 };
+			NTSTATUS hr = ZwWriteFile(hf, hEvent, 0, 0, &iob, (void*)rdo.data(), rdo.length(), &bo, 0);
+			if (hr == STATUS_PENDING)
+			{
+				WaitForSingleObject(hEvent, INFINITE);
+				hr = iob.Status;
+			}
+			rdo.clear();
+			if (FAILED(hr)) break;
 		}
-		rdo.append(buf, olen);
-	} while (hr == STATUS_BUFFER_TOO_SMALL);
+		else
+			break;
+	}
 
 	CloseHandle(hEvent);
 	return hr == STATUS_SUCCESS;

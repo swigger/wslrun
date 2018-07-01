@@ -155,6 +155,8 @@ struct adss_msg_out
 	int errno_;
 	int unk1;
 	int64_t fd;
+	int64_t fd2;//unknown fd. a write pipe for a char dev?
+	int64_t flags; //flags of process type. peb[0x4a]==2?1:0
 };
 
 #pragma warning(pop)

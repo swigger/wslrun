@@ -12,7 +12,7 @@ typedef int _LxssDistributionState;
 MIDL_INTERFACE("536A6BCF-FE04-41D9-B978-DCACA9A9B5B9")
 ILxssUserSession : public IUnknown
 {
-	virtual HRESULT STDMETHODCALLTYPE CreateInstance(_GUID const *,_GUID const &,void * *) = 0;
+	virtual HRESULT STDMETHODCALLTYPE CreateInstance(_GUID const *, DWORD idx,  _GUID const &,void * *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE RegisterDistribution(USHORT const *,DWORD,USHORT const *,USHORT const *,_GUID *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetDistributionId(USHORT const *,DWORD,_GUID *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE InitializeFileSystem(USHORT const *) = 0;
@@ -55,9 +55,10 @@ ILxssInstance : public IUnknown
 {
 	virtual HRESULT STDMETHODCALLTYPE RegisterAdssBusServer(char const *,DWORD *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetId(_GUID *) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetDistributionId(_GUID *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE CreateLxProcess(char const * exec_path, unsigned long argc, char const * * argv,
-		unsigned long env_cnt,char const * * env, LPCOLESTR cwd, LPCOLESTR search_paths, DWORD sync_io,
-		_LXSS_STD_HANDLES * hds, _LXSS_CONSOLE_DATA * data,
+		unsigned long env_cnt,char const * * env, LPCOLESTR cwd, LPCOLESTR search_paths, LPCOLESTR envs, 
+		DWORD env_sz, DWORD sync_io, _LXSS_STD_HANDLES * hds, _LXSS_CONSOLE_DATA * data,
 		DWORD user_id, DWORD * pObjProcess,DWORD * pObjMessage) = 0;
 	virtual HRESULT STDMETHODCALLTYPE ConnectAdssBusServer(char const *,DWORD *) = 0;
 	//virtual void vdtor(unsigned int v) = 0;
