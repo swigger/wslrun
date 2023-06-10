@@ -8,6 +8,8 @@ DEFINE_GUID(lxInstanceGuid, 0x8F9E8123, 0x58D4, 0x484A, 0xAC, 0x25, 0x7E, 0xF7, 
 
 //should be enum.
 typedef int _LxssDistributionState;
+typedef struct {
+} _LXSS_STD_HANDLE_TYPES;
 
 MIDL_INTERFACE("536A6BCF-FE04-41D9-B978-DCACA9A9B5B9")
 ILxssUserSession : public IUnknown
@@ -15,15 +17,16 @@ ILxssUserSession : public IUnknown
 	virtual HRESULT STDMETHODCALLTYPE CreateInstance(_GUID const *, DWORD idx,  _GUID const &,void * *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE RegisterDistribution(USHORT const *,DWORD,USHORT const *,USHORT const *,_GUID *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetDistributionId(USHORT const *,DWORD,_GUID *) = 0;
-	virtual HRESULT STDMETHODCALLTYPE InitializeFileSystem(USHORT const *) = 0;
-	virtual HRESULT STDMETHODCALLTYPE SetDistributionState(_GUID const *,_LxssDistributionState,_LxssDistributionState *) = 0;
-	virtual HRESULT STDMETHODCALLTYPE QueryDistributionState(_GUID const *,_LxssDistributionState *) = 0;
+	virtual HRESULT STDMETHODCALLTYPE TerminateDistribution(_GUID const *)=0;
 	virtual HRESULT STDMETHODCALLTYPE UnregisterDistribution(_GUID const *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE ConfigureDistribution(_GUID const *,char const *,DWORD,DWORD,char const * *,DWORD) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetDistributionConfiguration(_GUID const *,USHORT * *,DWORD *,USHORT * *,char * *,DWORD *,DWORD *,char * * *,DWORD *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetDefaultDistribution(_GUID *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE SetDefaultDistribution(_GUID const *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE EnumerateDistributions(DWORD,DWORD *,_GUID * *) = 0;
+	virtual HRESULT STDMETHODCALLTYPE CreateLxProcess(_GUID const *, char const *, DWORD, char const * *, USHORT const *, USHORT const *, USHORT *, DWORD, USHORT const *, short, short, DWORD, _LXSS_STD_HANDLE_TYPES *, _GUID *, void * *, void * *, void * *, void * *)=0;
+	virtual HRESULT STDMETHODCALLTYPE BeginUpgradeDistribution(_GUID const *, DWORD *, USHORT * *)=0;
+	virtual HRESULT STDMETHODCALLTYPE FinishUpgradeDistribution(_GUID const *, DWORD)=0;
 };
 
 enum _LXSS_STD_HANDLE_TYPE {
@@ -53,17 +56,22 @@ struct _LXSS_CONSOLE_DATA
 MIDL_INTERFACE("8F9E8123-58D4-484A-AC25-7EF7D5F7448F")
 ILxssInstance : public IUnknown
 {
-	virtual HRESULT STDMETHODCALLTYPE RegisterAdssBusServer(char const *,DWORD *) = 0;
+	virtual HRESULT STDMETHODCALLTYPE RegisterAdssBusServer(char const *, void**) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetId(_GUID *) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetDistributionId(_GUID *) = 0;
-	virtual HRESULT STDMETHODCALLTYPE CreateLxProcess(char const * exec_path, unsigned long argc, char const * * argv,
-		unsigned long env_cnt,char const * * env, LPCOLESTR cwd, LPCOLESTR search_paths, LPCOLESTR envs, 
-		DWORD env_sz, DWORD sync_io, _LXSS_STD_HANDLES * hds, _LXSS_CONSOLE_DATA * data,
-		DWORD user_id, DWORD * pObjProcess,DWORD * pObjMessage) = 0;
-	virtual HRESULT STDMETHODCALLTYPE ConnectAdssBusServer(char const *,DWORD *) = 0;
-	//virtual void vdtor(unsigned int v) = 0;
-	//virtual _LxssDistributionState GetState(void) = 0;
-	//virtual void Start(void) = 0;
-	//virtual void Stop(void) = 0;
-	//virtual void _Terminate(void) = 0;
+	virtual HRESULT STDMETHODCALLTYPE CreateLxProcess(
+		char const * exec_path, unsigned long argc, char const * * argv,
+		LPCOLESTR cwd, LPCOLESTR search_paths, LPOLESTR envs,
+		DWORD sync_io, _LXSS_STD_HANDLES * hds,
+		DWORD user_id, BSTR xx, void**, void**) = 0;
+	virtual HRESULT STDMETHODCALLTYPE ConnectAdssBusServer(char const *, void**) = 0;
 };
+/*
+::RegisterAdssBusServer(char const *,void * *)
+::GetId(_GUID *)
+::GetDistributionId(_GUID *)
+::CreateLxProcess(char const *,ulong,char const * *,
+ushort const * cwd,ushort const * s,ushort * env,
+ulong,_LXSS_STD_HANDLES *,ulong,ushort const *,void * *,void * *)
+::ConnectAdssBusServer(char const *,void * *)
+*/
